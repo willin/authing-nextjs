@@ -1,2 +1,12 @@
 root: true
-extends: willin
+extends:
+  - '@willin'
+  - plugin:@typescript-eslint/recommended-requiring-type-checking
+plugins:
+  - import
+parserOptions:
+  project: ./tsconfig.json
+  tsconfigRootDir: ./
+settings:
+  import/resolver:
+    typescript: {}

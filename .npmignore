@@ -1,4 +1,5 @@
-
+.npmrc
+examples/
 demo/
 /swagger-ui*
 globalConfig.json
