@@ -2,28 +2,28 @@
 
 [![npm](https://img.shields.io/npm/v/@authing/nextjs.svg)](https://npmjs.org/package/@authing/nextjs) [![npm](https://img.shields.io/npm/dt/@authing/nextjs.svg)](https://npmjs.org/package/@authing/nextjs)
 
-[中文说明](./readme.zh.md)
+[English](./readme.md)
 
 Simple Authing OIDC Authentication for Next.js
 
 - [@authing/nextjs](#authingnextjs)
-  - [Functions](#functions)
+  - [实用方法](#实用方法)
     - [isAuthenticated](#isauthenticated)
-  - [API Helpers](#api-helpers)
+  - [API 辅助](#api-辅助)
     - [createCallbackApi](#createcallbackapi)
     - [createLoginApi](#createloginapi)
     - [createLogoutApi](#createlogoutapi)
-  - [Quick Start](#quick-start)
-    - [Add dependencies](#add-dependencies)
-    - [Config](#config)
-    - [Create SessionStorage](#create-sessionstorage)
-    - [Create Login, Logout, Callback APIs](#create-login-logout-callback-apis)
-    - [Use in SSR](#use-in-ssr)
-    - [Use in SSG](#use-in-ssg)
-  - [Others](#others)
+  - [项目示例](#项目示例)
+    - [安装依赖](#安装依赖)
+    - [配置环境变量](#配置环境变量)
+    - [创建 SessionStorage](#创建-sessionstorage)
+    - [创建登录、注销和回调 API](#创建登录注销和回调-api)
+    - [在 SSR 中使用](#在-ssr-中使用)
+    - [在 SSG 中使用](#在-ssg-中使用)
+  - [其他](#其他)
   - [LICENSE](#license)
 
-## Functions
+## 实用方法
 
 ### isAuthenticated
 
@@ -38,13 +38,13 @@ function isAuthenticated<User = any>(
 ): User;
 ```
 
-Params:
+参数说明：
 
-- `throwOnError`: throw error when not authenticated
+- `throwOnError`： 未登录抛出错误
 
-Return Type: `User`
+返回值： `User`
 
-## API Helpers
+## API 辅助
 
 ### createCallbackApi
 
@@ -69,13 +69,15 @@ function createCallbackApi({
 ) => Promise<void>;
 ```
 
-Params:
+参数说明：
 
-- `appDomain`: App Domain, like: `https://your-app.authing.cn`
-- `clientId`: App ID
-- `clientSecret`: App Secret
-- `failureRedirect`: redirect when failed, such as `/error`
-- `successRedirect`: redirect when success, such as `/dashboard`
+- `appDomain`： 应用域名，如： `https://your-app.authing.cn`
+- `clientId`： App ID
+- `clientSecret`： App Secret
+- `sessionStorage`： Remix SessionStorage
+  - 注意：如果是 Remix v1.1.3 及之前版本，请不要使用 CookieSession，会存在 UTF-8 编码解析错误
+- `failureRedirect`： 登录失败重定向地址，如：`/error`
+- `successRedirect`： 成功重定向地址，如：`/dashboard`
 
 ### createLoginApi
 
@@ -95,13 +97,13 @@ function createLoginApi({
 }: LoginApiArgs): (req: NextApiRequest, res: NextApiResponse) => void;
 ```
 
-Params:
+参数说明：
 
-- `appDomain`: App Domain, like: `https://your-app.authing.cn`
-- `clientId`: App ID
-- `redirectUri`: Callback Redirect URI (same with Authing console configuration)
-- `sope`: OAuth Scope, like: `openid profile email`
-  - Ref: [Documentation](https://docs.authing.cn/v2/concepts/oidc-common-questions.html#scope-%E5%8F%82%E6%95%B0%E5%AF%B9%E5%BA%94%E7%9A%84%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
+- `appDomain`： 应用域名，如： `https://your-app.authing.cn`
+- `clientId`： App ID
+- `redirectUri`： 登录回调 URL （需要与 Authing 控制台中配置一致）
+- `sope`： 授权范围，如：`openid profile email`
+  - 参考： [官方文档](https://docs.authing.cn/v2/concepts/oidc-common-questions.html#scope-%E5%8F%82%E6%95%B0%E5%AF%B9%E5%BA%94%E7%9A%84%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
 
 ### createLogoutApi
 
@@ -117,16 +119,16 @@ function createLogoutApi({
 }: LogoutApiArgs): (req: NextApiRequest, res: NextApiResponse) => void;
 ```
 
-Params:
+参数说明：
 
-- `appDomain`: App Domain, like: `https://your-app.authing.cn`
-- `redirectUri`: Logout Callback Redirect URI (same in authing console)
+- `appDomain`： 应用域名，如： `https://your-app.authing.cn`
+- `redirectUri`： 登出回调 URL （非登录，也需要与 Authing 控制台中配置一致）
 
-## Quick Start
+## 项目示例
 
-Example project at `examples/basic`.
+参考 `examples/basic` 项目。
 
-### Add dependencies
+### 安装依赖
 
 ```bash
 npm install --save @authing/nextjs iron-session swr
@@ -134,9 +136,9 @@ npm install --save @authing/nextjs iron-session swr
 yarn add @authing/nextjs iron-session swr
 ```
 
-### Config
+### 配置环境变量
 
-Placed in `config/index.ts` or somewhere else.
+如 `config/index.ts`，或者其他地方。建议不要忽略该步骤，将用到的变量参数统一管理。
 
 ```ts
 export const clientId =
@@ -150,15 +152,15 @@ export const logoutRedirectUri =
   process.env.AUTHING_LOGOUT_REDIRECT_URI || 'http://localhost:3000/';
 ```
 
-### Create SessionStorage
+### 创建 SessionStorage
 
-Create `lib/session.ts`. In this example we use `iron-session` to store session.
+创建 `lib/session.ts`。示例中使用的是 `iron-session` 进行创建。
 
-### Create Login, Logout, Callback APIs
+### 创建登录、注销和回调 API
 
-Notice that login url is `/api/login`, and logout is `/api/logout`
+注意：登录 URL 为 `/api/login`， 注销为 `/api/logout`
 
-Create `pages/api/login.ts`:
+创建 `pages/api/login.ts`：
 
 ```ts
 import { createLoginApi } from '@authing/nextjs';
@@ -172,7 +174,7 @@ export default createLoginApi({
 });
 ```
 
-Create `pages/api/logout.ts`:
+创建 `pages/api/logout.ts`：
 
 ```ts
 import { withIronSessionApiRoute } from 'iron-session/next';
@@ -189,7 +191,7 @@ export default withIronSessionApiRoute(
 );
 ```
 
-Create `pages/api/callback.ts`:
+创建 `pages/api/callback.ts`：
 
 ```ts
 import { createCallbackApi } from '@authing/nextjs';
@@ -210,7 +212,9 @@ export default withIronSessionApiRoute(
 );
 ```
 
-### Use in SSR
+### 在 SSR 中使用
+
+参考 `pages/ssr.tsx`：
 
 ```ts
 import { withIronSessionSsr } from 'iron-session/next';
@@ -240,9 +244,9 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 sessionOptions);
 ```
 
-### Use in SSG
+### 在 SSG 中使用
 
-Create API: `pages/api/me.ts`:
+创建接口： `pages/api/me.ts`：
 
 ```ts
 import { withIronSessionApiRoute } from 'iron-session/next';
@@ -273,7 +277,7 @@ async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
 }
 ```
 
-Create React hook `hooks/use-user.ts`:
+创建钩子 `hooks/use-user.ts`：
 
 ```ts
 import { useEffect } from 'react';
@@ -306,7 +310,7 @@ export default function useUser({
 }
 ```
 
-Create page `pages/sg.tsx`:
+创建页面 `pages/sg.tsx`：
 
 ```ts
 import useUser from '../hooks/use-user';
@@ -333,7 +337,7 @@ export default function SgProfile() {
 }
 ```
 
-## Others
+## 其他
 
 - [@authing/remix](https://github.com/Authing/authing-remix)
 
