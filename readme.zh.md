@@ -84,6 +84,7 @@ function createCallbackApi({
 ```ts
 type LoginApiArgs = {
   appDomain: string;
+  ssoDomain?: string;
   clientId: string;
   redirectUri: string;
   scope: string;
@@ -91,6 +92,7 @@ type LoginApiArgs = {
 
 function createLoginApi({
   appDomain,
+  ssoDomain,
   clientId,
   redirectUri,
   scope
@@ -100,6 +102,7 @@ function createLoginApi({
 参数说明：
 
 - `appDomain`： 应用域名，如： `https://your-app.authing.cn`
+- `ssoDomain`： SSO 域名，如： `https://your-app.authing.cn`，如果设置，将会使用 SSO 登录
 - `clientId`： App ID
 - `redirectUri`： 登录回调 URL （需要与 Authing 控制台中配置一致）
 - `sope`： 授权范围，如：`openid profile email`

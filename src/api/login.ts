@@ -3,7 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export type LoginApiArgs = {
   // such as: https://remix.authing.cn
-  appDomain: string;
+  appDomain?: string;
+  // such as: https://remix-sso.authing.cn
+  ssoDomain?: string;
   // such as: 61dcecxxxx318xxxx04acdf5
   clientId: string;
   // such as: http://localhost:3000/authing/callback
@@ -14,14 +16,12 @@ export type LoginApiArgs = {
 
 export function createLoginApi({
   appDomain,
+  ssoDomain,
   clientId,
   redirectUri,
   scope
 }: LoginApiArgs) {
-  return function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-  ): void {
+  return function handler(req: NextApiRequest, res: NextApiResponse): void {
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirectUri,
@@ -29,7 +29,9 @@ export function createLoginApi({
       response_type: 'code',
       nonce: `${new Date().getTime()}`
     });
-    const url = `${appDomain}/oidc/auth?${params.toString()}`;
+    const url = ssoDomain
+      ? `${ssoDomain}/login?app_id=${clientId}`
+      : `${appDomain!}/oidc/auth?${params.toString()}`;
     res.redirect(302, url);
   };
 }
