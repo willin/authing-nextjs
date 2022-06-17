@@ -14,12 +14,9 @@ export function createLogoutApi({ appDomain, redirectUri }: LogoutApiArgs) {
     const { redirect } = req.query;
     if (redirect) {
       const params = new URLSearchParams({
-        redirect_uri: redirectUri
+        redirectUri: redirectUri
       });
-      res.redirect(
-        302,
-        `${appDomain}/login/profile/logout?${params.toString()}`
-      );
+      res.redirect(302, `${appDomain}/logout?${params.toString()}`);
       return;
     }
     req.session?.destroy?.();
